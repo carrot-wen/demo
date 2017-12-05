@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private int mCurrentIndex = 0;
+    private int mTrueAnswerNum = 0;
+    private int mAnswerNum = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +46,17 @@ public class MainActivity extends AppCompatActivity {
         mTrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                mQuestionBank[mCurrentIndex].setAnswered(true);
+                closeAnswerButton();
                checkAnswer(true);
             }
         });
         mFalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               checkAnswer(false);
+                mQuestionBank[mCurrentIndex].setAnswered(true);
+                closeAnswerButton();
+                checkAnswer(false);
             }
         });
         mPrevButton.setOnClickListener(new View.OnClickListener() {
@@ -71,17 +77,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateQuestion() {
-        mQuestionView.setText(mQuestionBank[mCurrentIndex].getTextResId());
+        Question question = mQuestionBank[mCurrentIndex];
+        mQuestionView.setText(question.getTextResId());
+        if(question.isAnswered()) {
+            closeAnswerButton();
+        } else {
+            openAnswerButton();
+        }
     }
 
     private void checkAnswer(boolean answer) {
         int id;
+        mAnswerNum++;
         if(answer == mQuestionBank[mCurrentIndex].isAnswerTrue()) {
            id = R.string.correct_toast;
+           mTrueAnswerNum++;
         } else {
            id = R.string.incorrect_toast;
         }
         Toast.makeText(MainActivity.this, id,
                 Toast.LENGTH_SHORT).show();
+        if(mAnswerNum == mQuestionBank.length) {
+            Toast.makeText(MainActivity.this, "you answer " + mAnswerNum
+                    + " questions and "+ mTrueAnswerNum + " answers is true.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openAnswerButton() {
+        mTrueButton.setClickable(true);
+        mFalseButton.setClickable(true);
+    }
+
+    private void closeAnswerButton() {
+        mTrueButton.setClickable(false);
+        mFalseButton.setClickable(false);
     }
 }
