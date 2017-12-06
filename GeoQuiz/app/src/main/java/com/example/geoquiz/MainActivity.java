@@ -1,5 +1,7 @@
 package com.example.geoquiz;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,11 +11,15 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_CHEAT = 0;
+
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mPrevButton;
     private Button mNextButton;
+    private Button mCheatButton;
     private TextView mQuestionView;
+    private boolean mIsCheater;
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_australia,true),
@@ -69,11 +75,34 @@ public class MainActivity extends AppCompatActivity {
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsCheater = false;
                 mCurrentIndex = (mCurrentIndex+1) % mQuestionBank.length;
                 updateQuestion();
             }
         });
+        mCheatButton = findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+               Intent intent = CheatActivity.newIntent(MainActivity.this,answerIsTrue);
+               startActivityForResult(intent,REQUEST_CODE_CHEAT);
+            }
+        });
         updateQuestion();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data == null) {
+                return;
+            }
+            mIsCheater = CheatActivity.wasAnswerShown(data);
+        }
     }
 
     private void updateQuestion() {
@@ -89,11 +118,13 @@ public class MainActivity extends AppCompatActivity {
     private void checkAnswer(boolean answer) {
         int id;
         mAnswerNum++;
-        if(answer == mQuestionBank[mCurrentIndex].isAnswerTrue()) {
-           id = R.string.correct_toast;
-           mTrueAnswerNum++;
+        if (mIsCheater) {
+            id = R.string.judgment_toast;
+        } else if(answer == mQuestionBank[mCurrentIndex].isAnswerTrue()) {
+            id = R.string.correct_toast;
+            mTrueAnswerNum++;
         } else {
-           id = R.string.incorrect_toast;
+            id = R.string.incorrect_toast;
         }
         Toast.makeText(MainActivity.this, id,
                 Toast.LENGTH_SHORT).show();
