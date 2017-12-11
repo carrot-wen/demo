@@ -5,9 +5,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +52,7 @@ public class CrimeListFragment extends Fragment{
 
         private TextView mTitleTextView;
         private TextView mDateTextView;
-
+        private ImageView mSolvedImageView;
         private Crime mCrime;
 
         public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -58,12 +60,16 @@ public class CrimeListFragment extends Fragment{
             itemView.setOnClickListener(this);
             mTitleTextView = itemView.findViewById(R.id.crime_title);
             mDateTextView = itemView.findViewById(R.id.crime_date);
+            mSolvedImageView = itemView.findViewById(R.id.crime_solved);
         }
 
         public void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
-            mDateTextView.setText(mCrime.getDate().toString());
+            String date = (String) DateFormat.format("EEEE, MMM dd,yyyy",mCrime.getDate());
+            mDateTextView.setText(date);
+            mSolvedImageView.setVisibility(crime.isSolved()?View.VISIBLE:View.GONE);
+
         }
 
         @Override
@@ -78,7 +84,6 @@ public class CrimeListFragment extends Fragment{
 
         private TextView mTitleTextView;
         private TextView mDateTextView;
-
         private Crime mCrime;
 
         public SeriousCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -92,6 +97,7 @@ public class CrimeListFragment extends Fragment{
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDate().toString());
+
         }
 
         @Override
