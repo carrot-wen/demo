@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalinten;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by wenzhang on 2017/12/10.
@@ -26,6 +28,7 @@ public class CrimeListFragment extends Fragment{
 
     private static final int NEED_POLICE = 0;
     private static final int NO_NEED_POLICE = 1;
+    private static final int REQUEST_CRIME = 2;
 
     @Nullable
     @Override
@@ -39,13 +42,30 @@ public class CrimeListFragment extends Fragment{
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CRIME) {
+            UUID id = (UUID) data.getSerializableExtra(CrimeFragment.CRIME_ID);
+            updateUI(id);
+        }
+    }
+
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
-
         mAdapter = new CrimeAdapter(crimes);
         mCrimeRecyclerView.setAdapter(mAdapter);
     }
+
+    private void updateUI(UUID id) {
+        CrimeLab crimeLab = CrimeLab.get(getActivity());
+        int result = crimeLab.find(id);
+        if(result != -1) {
+            mAdapter.notifyItemChanged(result);
+        }
+    }
+
 
     private class CrimeHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener{
@@ -74,8 +94,8 @@ public class CrimeListFragment extends Fragment{
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(getActivity(),mCrime.getTitle()+ "clicked!",Toast.LENGTH_SHORT)
-                    .show();
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            startActivityForResult(intent,REQUEST_CRIME);
         }
     }
 
@@ -143,11 +163,7 @@ public class CrimeListFragment extends Fragment{
 
         @Override
         public int getItemViewType(int position) {
-            if (mCrimes.get(position).isRequiresPolice()){
-                return NEED_POLICE;
-            } else {
-                return NO_NEED_POLICE;
-            }
+            return NO_NEED_POLICE;
         }
     }
 }

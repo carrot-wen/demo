@@ -46,4 +46,14 @@ public class CrimeLab {
         }
         return null;
     }
+
+    public int find(UUID id) {
+        for (int i=0; i<mCrimes.size(); i++) {
+            if (mCrimes.get(i).getId().equals(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 }
