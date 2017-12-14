@@ -1,1 +1,2 @@
 # demo
+1 在第十一章的练习中遇到一个问题，在RecyclerView中用scrollToPosition跳转到新的item时，使用RecyclerView.getChildAt()得到的view中还是原来的item，所以要点两下按钮才能跳转到开始和末尾，但是如果点一下就返回总页面的话就会发现视图其实已经跳转了，不知道是不是更新机制的问题，百度了几个小时没找到相似的问题，只能搁置问题了
