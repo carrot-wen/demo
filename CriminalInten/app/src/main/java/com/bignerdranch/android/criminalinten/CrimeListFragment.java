@@ -1,12 +1,14 @@
 package com.bignerdranch.android.criminalinten;
 
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +27,25 @@ public class CrimeListFragment extends Fragment{
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private LinearLayoutManager mManager;
 
     private static final int NEED_POLICE = 0;
     private static final int NO_NEED_POLICE = 1;
     private static final int REQUEST_CRIME = 2;
+
+    public static void MoveToPosition(LinearLayoutManager manager, RecyclerView mRecyclerView, int n) {
+        int firstItem = manager.findFirstVisibleItemPosition();
+        int lastItem = manager.findLastVisibleItemPosition();
+        if (n <= firstItem) {
+            mRecyclerView.scrollToPosition(n);
+        } else if (n <= lastItem) {
+            int top = mRecyclerView.getChildAt(n - firstItem).getTop();
+            mRecyclerView.scrollBy(0, top);
+        } else {
+            mRecyclerView.scrollToPosition(n);
+        }
+
+    }
 
     @Nullable
     @Override
@@ -37,7 +54,8 @@ public class CrimeListFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
 
         mCrimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
-        mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mManager = new LinearLayoutManager(getActivity());
+        mCrimeRecyclerView.setLayoutManager(mManager);
         updateUI();
         return view;
     }
@@ -48,6 +66,17 @@ public class CrimeListFragment extends Fragment{
         if (requestCode == REQUEST_CRIME) {
             UUID id = (UUID) data.getSerializableExtra(CrimeFragment.CRIME_ID);
             updateUI(id);
+            if (data.getBooleanExtra(CrimeFragment.JUMP_TO_FIRST,false) ) {
+                mCrimeRecyclerView.scrollToPosition(0);
+                View view = mCrimeRecyclerView.getChildAt(0);
+                view.performClick();
+            } else if (data.getBooleanExtra(CrimeFragment.JUMP_TO_LAST,false)) {
+                int last = mManager.getItemCount()-1;
+                mCrimeRecyclerView.scrollToPosition(last);
+                View view = mCrimeRecyclerView.getChildAt(mCrimeRecyclerView.getChildCount()-1);
+                view.performClick();
+            }
+
         }
     }
 
@@ -94,7 +123,7 @@ public class CrimeListFragment extends Fragment{
 
         @Override
         public void onClick(View view) {
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivityForResult(intent,REQUEST_CRIME);
         }
     }
