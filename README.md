@@ -1,2 +1,4 @@
 # demo
 1 在第十一章的练习中遇到一个问题，在RecyclerView中用scrollToPosition跳转到新的item时，使用RecyclerView.getChildAt()得到的view中还是原来的item，所以要点两下按钮才能跳转到开始和末尾，但是如果点一下就返回总页面的话就会发现视图其实已经跳转了，不知道是不是更新机制的问题，百度了几个小时没找到相似的问题，只能搁置问题了
+2 在第十三章的练习二中遇到一个问题，在使用Plurals的时候，无论了getQuantityString()的quantity参数是多少，都只会使用item = other的字符串，我百度没有找到类似的错误，只能搁置了
+  另外新建Crime的时候，并没有对Crime的内容进行检查，所以空白的或格式不对的Crime也可以加入到list里，这个应该修改一下，增加一个判断函数，当crime不合格的时候弹出提示框而不退回主页面，但暂时没想好怎么搞。
